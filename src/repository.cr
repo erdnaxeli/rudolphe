@@ -41,7 +41,7 @@ class Rudolphe::Repository
         user_name = rs.read(String)
         day = rs.read(Int64?).try &.to_u8
         part = rs.read(Int64?).try &.to_u8
-        get_star_ts = rs.read(Int64?).try &.to_s
+        get_star_ts = rs.read(String?)
 
         if user = users[user_id]?
           if !day.nil? && !part.nil? && !get_star_ts.nil?
