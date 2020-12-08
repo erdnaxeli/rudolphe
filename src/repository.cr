@@ -39,13 +39,17 @@ class Rudolphe::Repository
       rs.each do
         user_id = rs.read(String)
         user_name = rs.read(String)
-        day = rs.read(UInt8?)
-        part = rs.read(UInt8?)
-        get_star_ts = rs.read(String?)
+        day = rs.read(Int64?).try &.to_u8
+        part = rs.read(Int64?).try &.to_u8
+        get_star_ts = rs.read(Int64?).try &.to_s
 
         if user = users[user_id]?
           if !day.nil? && !part.nil? && !get_star_ts.nil?
-            user.days[day] = {part => Star.new(get_star_ts)}
+            if user_day = user.days[day]?
+              user_day[part] = Star.new(get_star_ts)
+            else
+              user.days[day] = {part => Star.new(get_star_ts)}
+            end
           end
         else
           if !day.nil? && !part.nil? && !get_star_ts.nil?

@@ -1,5 +1,9 @@
 version: 2.0
 shards:
+  ameba:
+    git: https://github.com/crystal-ameba/ameba.git
+    version: 0.13.3
+
   caridina:
     git: https://github.com/erdnaxeli/caridina.git
     version: 0.7.0

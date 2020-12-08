@@ -46,6 +46,7 @@ module Rudolphe
         end
       end
 
+      Log.info { "Sleeping for 15 minutes" }
       sleep 15.minutes
     end
   end
