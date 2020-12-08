@@ -48,8 +48,22 @@ module Rudolphe
         end
       end
 
-      Log.info { "Sleeping for 15 minutes" }
-      sleep 15.minutes
+      # The new puzzle is out on midnight UTC-5
+      ny = Time::Location.fixed(-3600*5)
+      now = Time.local(ny)
+      if now.hour == 23 && (40..59).includes? now.minute
+        pause = now.at_end_of_hour - now
+        Log.info { "Sleeping for #{pause} before midnight" }
+        sleep pause
+        matrix.send("Nouveau puzzle : https://adventofcode.com/2020/day/#{now.day + 1}")
+
+        pause = (now + 15.minutes) - Time.local(ny)
+        Log.info { "Sleeping for #{pause} more" }
+        sleep pause
+      else
+        Log.info { "Sleeping for 15 minutes" }
+        sleep 15.minutes
+      end
     end
   end
 end
