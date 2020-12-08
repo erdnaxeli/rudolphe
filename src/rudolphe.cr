@@ -25,6 +25,8 @@ module Rudolphe
               parts.each_key do |part|
                 if !db_day.has_key?(part)
                   matrix.send("#{user.name} vient juste de compléter la partie #{part} du jour #{day}")
+                  db_day[part] = parts[part]
+                  repository.save_user_part(user_id, day, part, parts[part])
                 end
               end
             else

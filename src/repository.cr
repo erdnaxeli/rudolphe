@@ -84,13 +84,17 @@ class Rudolphe::Repository
 
   def save_user_day(user_id, day, parts) : Nil
     parts.each do |part, star|
-      @db.exec(
-        "insert into days (user_id, day, part, get_star_ts) values (?, ?, ?, ?)",
-        user_id,
-        day.to_i,
-        part.to_i,
-        star.get_star_ts,
-      )
+      save_user_part(user_id, day, part, star)
     end
+  end
+
+  def save_user_part(user_id, day, part, star)
+    @db.exec(
+      "insert into days (user_id, day, part, get_star_ts) values (?, ?, ?, ?)",
+      user_id,
+      day.to_i,
+      part.to_i,
+      star.get_star_ts,
+    )
   end
 end
