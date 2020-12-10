@@ -3,6 +3,7 @@ require "log"
 require "./aoc"
 require "./matrix"
 require "./repository"
+require "./scheduler"
 
 module Rudolphe
   VERSION = "0.1.0"
@@ -17,7 +18,7 @@ module Rudolphe
 
     db_leaderboard = repository.get_leaderboard
 
-    loop do
+    Scheduler.repeat(15.minutes) do
       aoc.get_leaderboard.try &.users.each do |user_id, user|
         if db_user = db_leaderboard.users[user_id]?
           user.days.each do |day, parts|
@@ -47,23 +48,13 @@ module Rudolphe
           db_leaderboard.users[user_id] = user
         end
       end
-
-      # The new puzzle is out on midnight UTC-5
-      ny = Time::Location.fixed(-3600*5)
-      now = Time.local(ny)
-      if now.hour == 23 && (40..59).includes? now.minute
-        pause = now.at_end_of_hour - now
-        Log.info { "Sleeping for #{pause} before midnight" }
-        sleep pause
-        matrix.send("Nouveau puzzle : https://adventofcode.com/2020/day/#{now.day + 1}")
-
-        pause = (now + 15.minutes) - Time.local(ny)
-        Log.info { "Sleeping for #{pause} more" }
-        sleep pause
-      else
-        Log.info { "Sleeping for 15 minutes" }
-        sleep 15.minutes
-      end
     end
+
+    # The new puzzle is out on midnight UTC-5, which is 6:00 at UTC+1
+    Scheduler.cron(6, 0) do
+      matrix.send("Nouveau puzzle : https://adventofcode.com/2020/day/#{Time.local.day}")
+    end
+
+    Scheduler.run
   end
 end
