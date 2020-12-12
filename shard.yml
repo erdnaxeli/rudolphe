@@ -15,7 +15,10 @@ license: MIT
 dependencies:
   caridina:
     github: erdnaxeli/caridina
-    version: 0.7.0
+    version: ~>0.7.0
+  marmot:
+    github: erdnaxeli/marmot
+    version: ~>0.1.0
   sqlite3:
     github: crystal-lang/crystal-sqlite3
     version: 0.17.0

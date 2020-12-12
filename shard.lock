@@ -12,6 +12,10 @@ shards:
     git: https://github.com/crystal-lang/crystal-db.git
     version: 0.10.0
 
+  marmot:
+    git: https://github.com/erdnaxeli/marmot.git
+    version: 0.1.1
+
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git
     version: 0.17.0

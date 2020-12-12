@@ -1,9 +1,10 @@
 require "log"
 
+require "marmot"
+
 require "./aoc"
 require "./matrix"
 require "./repository"
-require "./scheduler"
 
 module Rudolphe
   VERSION = "0.1.0"
@@ -18,7 +19,8 @@ module Rudolphe
 
     db_leaderboard = repository.get_leaderboard
 
-    Scheduler.repeat(15.minutes) do
+    Marmot.repeat(15.minutes, true) do
+      Log.info { "Checking leaderboard" }
       aoc.get_leaderboard.try &.users.each do |user_id, user|
         if db_user = db_leaderboard.users[user_id]?
           user.days.each do |day, parts|
@@ -51,10 +53,10 @@ module Rudolphe
     end
 
     # The new puzzle is out on midnight UTC-5, which is 6:00 at UTC+1
-    Scheduler.cron(6, 0) do
+    Marmot.cron(6, 0) do
       matrix.send("Nouveau puzzle : https://adventofcode.com/2020/day/#{Time.local.day}")
     end
 
-    Scheduler.run
+    Marmot.run
   end
 end
