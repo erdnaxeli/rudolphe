@@ -14,7 +14,8 @@ module Rudolphe
   def self.fly
     repository = Repository.new
     config = repository.get_config
-    matrix = Matrix.new(config)
+    matrix = Matrix.new(config, repository)
+    matrix.set_sync_task
     aoc = Aoc.new(config)
 
     db_leaderboard = repository.get_leaderboard

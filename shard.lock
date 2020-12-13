@@ -6,7 +6,7 @@ shards:
 
   caridina:
     git: https://github.com/erdnaxeli/caridina.git
-    version: 0.7.0
+    version: 0.7.1
 
   db:
     git: https://github.com/crystal-lang/crystal-db.git
@@ -14,7 +14,7 @@ shards:
 
   marmot:
     git: https://github.com/erdnaxeli/marmot.git
-    version: 0.1.1
+    version: 0.2.0
 
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git
