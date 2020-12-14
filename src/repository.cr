@@ -31,7 +31,7 @@ class Rudolphe::Repository
   def get_leaderboard : Leaderboard
     users = Hash(String, User).new
     @db.query("
-      select u.id, u.name, d.day, d.part, d.get_star_ts
+      select u.id, u.name, u.local_score, d.day, d.part, d.get_star_ts
       from users u
       left outer join days d on
         u.id = d.user_id
@@ -39,6 +39,7 @@ class Rudolphe::Repository
       rs.each do
         user_id = rs.read(String)
         user_name = rs.read(String)
+        local_score = rs.read(Int64).to_u16
         day = rs.read(Int64?).try &.to_u8
         part = rs.read(Int64?).try &.to_u8
         get_star_ts = rs.read(String?)
@@ -62,6 +63,7 @@ class Rudolphe::Repository
             days: days,
             id: user_id,
             name: user_name,
+            local_score: local_score,
           )
         end
       end
@@ -72,14 +74,23 @@ class Rudolphe::Repository
 
   def save_user(user) : Nil
     @db.exec(
-      "insert into users (id, name) values (?, ?)",
+      "insert into users (id, name, local_score) values (?, ?)",
       user.id,
       user.name,
+      user.local_score.to_i,
     )
 
     user.days.each do |day, parts|
       save_user_day(user.id, day, parts)
     end
+  end
+
+  def save_user_local_score(user)
+    @db.exec(
+      "update users set local_score = ? where id = ?",
+      user.local_score.to_i,
+      user.id,
+    )
   end
 
   def save_user_day(user_id, day, parts) : Nil
