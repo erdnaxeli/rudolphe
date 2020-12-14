@@ -16,6 +16,10 @@ shards:
     git: https://github.com/erdnaxeli/marmot.git
     version: 0.2.0
 
+  spectator:
+    git: https://gitlab.com/arctic-fox/spectator.git
+    version: 0.9.28
+
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git
     version: 0.17.0

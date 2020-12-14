@@ -59,6 +59,7 @@ module Rudolphe
     # The new puzzle is out on midnight UTC-5, which is 6:00 at UTC+1
     Marmot.cron(6, 0) do
       matrix.send("Nouveau puzzle : https://adventofcode.com/2020/day/#{Time.local.day}")
+      matrix.send_leaderboard
     end
 
     Marmot.run

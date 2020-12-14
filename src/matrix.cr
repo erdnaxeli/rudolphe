@@ -18,6 +18,12 @@ class Rudolphe::Matrix
     @conn.send_message(@config.room, message, formatted_message)
   end
 
+  def send_leaderboard
+    leaderboard = @repository.get_leaderboard
+    msg = leaderboard.to_s
+    send(msg, "<pre>#{msg}</pre>")
+  end
+
   def set_sync_task : Nil
     channel = Channel(Caridina::Responses::Sync).new
     @conn.sync(channel)
@@ -46,62 +52,7 @@ class Rudolphe::Matrix
 
     if event.sender != @conn.user_id && (message = event.content.as?(Caridina::Events::Message::Text))
       if message.body == "!lb"
-        msg = String.build do |str|
-          leaderboard = @repository.get_leaderboard
-          score_size = 0
-          position_size = leaderboard.users.size.to_s.size
-
-          users = leaderboard.users.values.sort_by do |user|
-            score_size = {score_size, user.local_score.to_s.size}.max
-            -user.local_score.to_i
-          end
-
-          # header tens
-          (1..position_size + score_size + 3).each { str << ' ' }
-          (1..25).each do |d|
-            if d < 10
-              str << ' '
-            elsif d < 20
-              str << 1
-            else
-              str << 2
-            end
-          end
-          str << '\n'
-
-          # header units
-          (1..position_size + score_size + 3).each { str << ' ' }
-          (1..25).each do |d|
-            str << d % 10
-          end
-          str << '\n'
-
-          users.each_with_index(1) do |user, i|
-            # position
-            str << sprintf("%#{position_size}d", i) << ") "
-
-            # score
-            str << sprintf("%#{score_size}d", user.local_score) << ' '
-
-            # stars
-            (1..25).each do |d|
-              day = user.days[d]?
-              if day.nil?
-                str << ' '
-              elsif day.size == 1
-                str << '+'
-              else
-                str << '×'
-              end
-            end
-
-            # username
-            str << ' ' << user.name_without_hl
-            str << '\n' if i < users.size
-          end
-        end
-
-        send(msg, "<pre>#{msg}</pre>")
+        send_leaderboard
       end
     end
   end
