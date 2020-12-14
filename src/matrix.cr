@@ -51,9 +51,9 @@ class Rudolphe::Matrix
           score_size = 0
           position_size = leaderboard.users.size.to_s.size
 
-          users = leaderboard.users.values.sort do |user|
+          users = leaderboard.users.values.sort_by do |user|
             score_size = {score_size, user.local_score.to_s.size}.max
-            user.local_score.to_i
+            -user.local_score.to_i
           end
 
           # header tens
