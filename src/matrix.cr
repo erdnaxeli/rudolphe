@@ -96,7 +96,7 @@ class Rudolphe::Matrix
             end
 
             # username
-            str << ' ' << user.name
+            str << ' ' << user.name_without_hl
             str << '\n' if i < users.size
           end
         end

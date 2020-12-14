@@ -25,6 +25,11 @@ struct User
   def name : String
     @name || "anon #{@id}"
   end
+
+  def name_without_hl : String
+    # It joins with a "zero width non-joiner" char.
+    name.split("").join('\u200C')
+  end
 end
 
 struct Star
