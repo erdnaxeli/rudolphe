@@ -74,7 +74,7 @@ class Rudolphe::Repository
 
   def save_user(user) : Nil
     @db.exec(
-      "insert into users (id, name, local_score) values (?, ?)",
+      "insert into users (id, name, local_score) values (?, ?, ?)",
       user.id,
       user.name,
       user.local_score.to_i,
