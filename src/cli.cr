@@ -1,3 +1,3 @@
 require "./rudolphe"
 
-Rudolphe.fly
+Rudolphe::Bot.new
