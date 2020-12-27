@@ -14,11 +14,11 @@ shards:
 
   marmot:
     git: https://github.com/erdnaxeli/marmot.git
-    version: 0.2.1
+    version: 0.3.0
 
   spectator:
     git: https://gitlab.com/arctic-fox/spectator.git
-    version: 0.9.28
+    version: 0.9.30
 
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git
