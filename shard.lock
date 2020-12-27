@@ -14,7 +14,7 @@ shards:
 
   marmot:
     git: https://github.com/erdnaxeli/marmot.git
-    version: 0.3.0
+    version: 0.3.1
 
   spectator:
     git: https://gitlab.com/arctic-fox/spectator.git
