@@ -6,7 +6,7 @@ require "./repository"
 
 class Rudolphe::Bot
   @config : Config
-  @db_leaderboard : Leaderboard
+  @current_leaderboard : Leaderboard
 
   def initialize
     @repository = Repository.new
@@ -15,7 +15,7 @@ class Rudolphe::Bot
     @matrix.set_sync_task
     @aoc = Aoc.new(@config)
 
-    @db_leaderboard = @repository.get_leaderboard
+    @current_leaderboard = @repository.get_leaderboard
 
     @quiet = false
     @leaderboard_task = Marmot.every(15.minutes, true) { check_leaderboard }
@@ -28,39 +28,57 @@ class Rudolphe::Bot
 
   def check_leaderboard : Nil
     Log.info { "Checking leaderboard" }
-    @aoc.get_leaderboard.try &.users.each do |user_id, user|
-      if db_user = @db_leaderboard.users[user_id]?
-        new_points = nil
-        if user.local_score != db_user.local_score
-          new_points = user.local_score - db_user.local_score
+    if leaderboard = @aoc.get_leaderboard
+      @current_leaderboard.diff_to(leaderboard).try &.users.each do |user_id, user|
+        if @current_leaderboard.users.has_key?(user_id)
           @repository.save_user_local_score(user)
-        end
 
-        user.days.each do |day, parts|
-          if db_day = db_user.days[day]?
-            parts.each_key do |part|
-              if !db_day.has_key?(part)
-                @matrix.send("#{user.name} vient juste de compléter la partie #{part} du jour #{day} (+#{new_points} points)")
-                @repository.save_user_part(user_id, day, part, parts[part])
-              end
-            end
-          else
-            if parts.size == 2
-              parts_msg = "les 2 parties"
+          days = user.days.map do |day, parts|
+            if @current_leaderboard.users[user_id].days.has_key?(day)
+              # If we already know this day, then one of its part was already
+              # done, hence the diff can contains only the other part.
+              part = parts.first_key
+              @repository.save_user_part(user_id, day, part, parts[part])
             else
-              parts_msg = "la partie #{parts.first_key}"
+              @repository.save_user_day(user_id, day, parts)
             end
 
-            @matrix.send("#{user.name} vient juste de compléter #{parts_msg} du jour #{day} (+#{new_points} points)")
-            @repository.save_user_day(user_id, day, parts)
+            if parts.size == 2
+              "le jour #{day}"
+            else
+              "la partie #{parts.first_key} du jour #{day}"
+            end
           end
+
+          msg = String.build do |str|
+            str << user.name << " vient juste de compléter "
+            if days.size == 1
+              str << days[0]
+            else
+              days[...-2].each { |d| str << d << ", " }
+              str << days[-2] << " et " << days[-1]
+            end
+
+            str << " (+" << user.local_score << " points)"
+          end
+
+          @matrix.send(msg)
+        else
+          @repository.save_user(user)
+
+          msg = String.build do |str|
+            str << "Un nouveau concurrent entre dans la place"
+            if user.local_score > 1
+              str << " avec " << user.local_score << " points"
+            end
+
+            str << ", bienvenue à " << user.name << " !"
+          end
+          @matrix.send(msg)
         end
-      else
-        @matrix.send("Un nouveau concurrent entre dans la place, bienvenue à #{user.name} !")
-        @repository.save_user(user)
       end
 
-      @db_leaderboard.users[user_id] = user
+      @current_leaderboard = leaderboard
     end
 
     reschedule_tasks
@@ -84,7 +102,7 @@ class Rudolphe::Bot
   end
 
   def send_puzzle_link
-    @matrix.send("Nouveau puzzle : https://adventofcode.com/#{Time.local.year}/day/#{Time.local.day}")
+    @matrix.send("Nouveau puzzle : https://adventofcode.com/#{Time.local.year}/day/#{Time.local.day}")
     @matrix.send_leaderboard
   end
 end
