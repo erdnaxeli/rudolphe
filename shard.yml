@@ -15,7 +15,7 @@ license: MIT
 dependencies:
   caridina:
     github: erdnaxeli/caridina
-    version: ~>0.7.0
+    version: ~>0.8.0
   marmot:
     github: erdnaxeli/marmot
     version: ~>0.3.0

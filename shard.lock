@@ -6,7 +6,7 @@ shards:
 
   caridina:
     git: https://github.com/erdnaxeli/caridina.git
-    version: 0.7.1
+    version: 0.8.0
 
   db:
     git: https://github.com/crystal-lang/crystal-db.git

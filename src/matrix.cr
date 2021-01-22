@@ -7,7 +7,7 @@ class Rudolphe::Matrix
   @first_sync = true
 
   def initialize(@config : Config, @repository : Rudolphe::Repository)
-    @conn = Caridina::ConnectionImpl.new(
+    @conn = Caridina::Connection.new(
       "https://cloud.cervoi.se",
       config.access_token,
     )
