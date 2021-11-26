@@ -12,12 +12,12 @@ Spectator.describe Leaderboard do
             "global_score":0,
             "completion_day_level":{
               "2":{
-                "1":{"get_star_ts":"1607203578"},
-                "2":{"get_star_ts":"1607205118"}
+                "1":{"get_star_ts":1607203578},
+                "2":{"get_star_ts":1607205118}
               },
               "6":{
-                "1":{"get_star_ts":"1607284003"},
-                "2":{"get_star_ts":"1607294072"}
+                "1":{"get_star_ts":1607284003},
+                "2":{"get_star_ts":1607294072}
               }
             },
             "local_score":42,
@@ -29,7 +29,7 @@ Spectator.describe Leaderboard do
           "699989":{
             "local_score":104,
             "completion_day_level":{
-              "5":{"1":{"get_star_ts":"1607193555"}}
+              "5":{"1":{"get_star_ts":1607193555}}
             },
             "global_score":0,
             "id":"699989",

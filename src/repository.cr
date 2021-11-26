@@ -42,7 +42,7 @@ class Rudolphe::Repository
         local_score = rs.read(Int64).to_u16
         day = rs.read(Int64?).try &.to_u8
         part = rs.read(Int64?).try &.to_u8
-        get_star_ts = rs.read(String?)
+        get_star_ts = rs.read(String?).try &.to_i
 
         if user = users[user_id]?
           if !day.nil? && !part.nil? && !get_star_ts.nil?

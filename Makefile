@@ -12,7 +12,7 @@ lint:
 	./bin/ameba src spec
 
 static:
-	docker run --rm -it -v ${PWD}:/workspace -w /workspace crystallang/crystal:0.35.1-alpine ./build_static.sh
+	docker run --rm -it -v ${PWD}:/workspace -w /workspace crystallang/crystal:1.2.2-alpine ./build_static.sh
 
 test:
 	crystal spec  --error-trace

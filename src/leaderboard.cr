@@ -133,7 +133,7 @@ end
 struct Star
   include JSON::Serializable
 
-  getter get_star_ts : String
+  getter get_star_ts : Int32
 
   def initialize(@get_star_ts)
   end
