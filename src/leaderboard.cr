@@ -107,7 +107,7 @@ struct User
   end
 
   def diff_to(other : User) : User?
-    new_points = @local_score - other.local_score
+    new_points = other.local_score - @local_score
     diff_days = Hash(UInt8, Hash(UInt8, Star)).new { |h, k| h[k] = Hash(UInt8, Star).new }
 
     other.days.each do |other_day, other_parts|
