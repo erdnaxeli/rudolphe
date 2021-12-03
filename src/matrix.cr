@@ -20,8 +20,10 @@ class Rudolphe::Matrix
 
   def send_leaderboard
     leaderboard = @repository.get_leaderboard
-    msg = leaderboard.to_s
-    send(msg, "<pre>#{msg}</pre>")
+    leaderboard.to_s.each_line.each_slice(10) do |lines|
+      msg = lines.join("\n")
+      send(msg, "<pre>#{msg}</pre>")
+    end
   end
 
   def set_sync_task : Nil
