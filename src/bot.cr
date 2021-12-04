@@ -31,18 +31,7 @@ class Rudolphe::Bot
     if leaderboard = @aoc.get_leaderboard
       @current_leaderboard.diff_to(leaderboard).try &.users.each do |user_id, user|
         if @current_leaderboard.users.has_key?(user_id)
-          @repository.save_user_local_score(user)
-
           days = user.days.map do |day, parts|
-            if @current_leaderboard.users[user_id].days.has_key?(day)
-              # If we already know this day, then one of its part was already
-              # done, hence the diff can contains only the other part.
-              part = parts.first_key
-              @repository.save_user_part(user_id, day, part, parts[part])
-            else
-              @repository.save_user_day(user_id, day, parts)
-            end
-
             if parts.size == 2
               "le jour #{day}"
             else
@@ -64,8 +53,6 @@ class Rudolphe::Bot
 
           @matrix.send(msg)
         else
-          @repository.save_user(user)
-
           msg = String.build do |str|
             str << "Un nouveau concurrent entre dans la place"
             if user.local_score > 1
@@ -79,6 +66,7 @@ class Rudolphe::Bot
       end
 
       @current_leaderboard = leaderboard
+      @repository.save_leaderboard(leaderboard)
     end
 
     reschedule_tasks

@@ -72,6 +72,38 @@ class Rudolphe::Repository
     Leaderboard.new(users)
   end
 
+  def save_leaderboard(leaderboard) : Nil
+    leaderboard.users.each do |user_id, user|
+      @db.exec(
+        "insert or replace into users (id, name, local_score) values (?, ?, ?)",
+        user.id,
+        user.name,
+        user.local_score.to_i
+      )
+      user.days.each do |day, parts|
+        parts.each do |part, star|
+          @db.exec(
+            "
+              insert or replace into days (user_id, day, part, get_star_ts)
+              values (?, ?, ?, ?)
+            ",
+            user_id,
+            day.to_i,
+            part.to_i,
+            star.get_star_ts,
+          )
+        end
+      end
+    end
+
+    params = leaderboard.users.map { '?' }.join(',')
+    user_ids = leaderboard.users.map { |user_id, _| user_id }
+    @db.exec(
+      "delete from users where id not in (#{params})",
+      args: user_ids
+    )
+  end
+
   def save_user(user) : Nil
     @db.exec(
       "insert into users (id, name, local_score) values (?, ?, ?)",
@@ -85,10 +117,11 @@ class Rudolphe::Repository
     end
   end
 
-  def save_user_local_score(user)
+  def update_user(user)
     @db.exec(
-      "update users set local_score = ? where id = ?",
+      "update users set local_score = ? , name = ? where id = ?",
       user.local_score.to_i,
+      user.name,
       user.id,
     )
   end
