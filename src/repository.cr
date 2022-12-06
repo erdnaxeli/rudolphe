@@ -29,7 +29,7 @@ class Rudolphe::Repository
   end
 
   def get_leaderboard : Leaderboard
-    users = Hash(String, User).new
+    users = Hash(UInt64, User).new
     @db.query("
       select u.id, u.name, u.local_score, d.day, d.part, d.get_star_ts
       from users u
@@ -37,7 +37,7 @@ class Rudolphe::Repository
         u.id = d.user_id
     ") do |rs|
       rs.each do
-        user_id = rs.read(String)
+        user_id = rs.read(Int64).to_u64
         user_name = rs.read(String)
         local_score = rs.read(Int64).to_u16
         day = rs.read(Int64?).try &.to_u8
@@ -76,7 +76,7 @@ class Rudolphe::Repository
     leaderboard.users.each do |user_id, user|
       @db.exec(
         "insert or replace into users (id, name, local_score) values (?, ?, ?)",
-        user.id,
+        user.id.to_i,
         user.name,
         user.local_score.to_i
       )
@@ -87,7 +87,7 @@ class Rudolphe::Repository
               insert or replace into days (user_id, day, part, get_star_ts)
               values (?, ?, ?, ?)
             ",
-            user_id,
+            user_id.to_i,
             day.to_i,
             part.to_i,
             star.get_star_ts,
@@ -100,14 +100,14 @@ class Rudolphe::Repository
     user_ids = leaderboard.users.map { |user_id, _| user_id }
     @db.exec(
       "delete from users where id not in (#{params})",
-      args: user_ids
+      args: user_ids.map(&.to_i)
     )
   end
 
   def save_user(user) : Nil
     @db.exec(
       "insert into users (id, name, local_score) values (?, ?, ?)",
-      user.id,
+      user.id.to_i,
       user.name,
       user.local_score.to_i,
     )
@@ -122,7 +122,7 @@ class Rudolphe::Repository
       "update users set local_score = ? , name = ? where id = ?",
       user.local_score.to_i,
       user.name,
-      user.id,
+      user.id.to_i,
     )
   end
 
@@ -135,7 +135,7 @@ class Rudolphe::Repository
   def save_user_part(user_id, day, part, star)
     @db.exec(
       "insert into days (user_id, day, part, get_star_ts) values (?, ?, ?, ?)",
-      user_id,
+      user_id.to_i,
       day.to_i,
       part.to_i,
       star.get_star_ts,

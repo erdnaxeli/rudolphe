@@ -4,7 +4,7 @@ struct Leaderboard
   include JSON::Serializable
 
   @[JSON::Field(key: "members")]
-  getter users : Hash(String, User)
+  getter users : Hash(UInt64, User)
 
   def initialize(@users)
   end
@@ -66,7 +66,7 @@ struct Leaderboard
   end
 
   def diff_to(other : Leaderboard) : Leaderboard?
-    diff_users = Hash(String, User).new
+    diff_users = Hash(UInt64, User).new
     other.users.each do |other_id, other_user|
       if user = @users[other_id]?
         if diff_user = user.diff_to(other_user)
@@ -90,7 +90,7 @@ struct User
 
   @[JSON::Field(key: "completion_day_level")]
   getter days = Hash(UInt8, Hash(UInt8, Star)).new
-  getter id : String
+  getter id : UInt64
   getter local_score : UInt16
   @name : String?
 
