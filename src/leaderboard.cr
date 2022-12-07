@@ -13,7 +13,7 @@ struct Leaderboard
     score_size = 0
     position_size = @users.size.to_s.size
 
-    users = @users.values.sort_by do |user|
+    users = @users.values.select { |u| u.local_score > 0 }.sort_by! do |user|
       score_size = {score_size, user.local_score.to_s.size}.max
       -user.local_score.to_i
     end
