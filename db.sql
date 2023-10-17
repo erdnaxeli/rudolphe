@@ -1,18 +1,19 @@
-CREATE TABLE config (
-	access_token varchar,
-	room varchar,
-	session_cookie varchar,
-	leaderboard_url varchar
+CREATE TABLE users (
+    id VARCHAR PRIMARY KEY,
+    name VARCHAR
 );
-CREATE TABLE IF NOT EXISTS "days" (
-	user_id varchar references users(id),
-	day int,
-	part int,
-	get_star_ts varchar,
-	primary key (user_id, day, part)
+
+CREATE TABLE scores (
+    id INTEGER PRIMARY KEY,
+    year INTEGER,
+    score INTEGER,
+    user_id VARCHAR REFERENCES users(id),
+    UNIQUE (year, user_id)
 );
-CREATE TABLE IF NOT EXISTS "users" (
-	id varchar primary key,
-	name varchar,
-	local_score integer not null default 0
+
+CREATE TABLE days (
+    day INTEGER,
+    parts INTEGER,
+    score_id INTEGER REFERENCES scores(id),
+    PRIMARY KEY (day, score_id)
 );

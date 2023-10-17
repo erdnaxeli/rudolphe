@@ -1,20 +1,20 @@
-all:
-	shards build
+ifeq ($(CI), true)
+	GO = go
+else
+	GO = go1.21.3
+endif
 
-doc:
-	crystal doc
 
-init-dev:
-	shards install
+all: build
 
-lint:
-	crystal tool format
-	./bin/ameba src spec
+build:
+	$(GO) build -ldflags="-s -w" ./cmd/rudolphe
 
-static:
-	docker run --rm -it -v ${PWD}:/workspace -w /workspace crystallang/crystal:1.2.2-alpine ./build_static.sh
+
+style:
+	$(GO) fmt ./...
+	golangci-lint run
 
 test:
-	crystal spec  --error-trace
+	$(GO) test ./...
 
-.PHONY: test
