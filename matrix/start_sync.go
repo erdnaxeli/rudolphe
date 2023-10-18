@@ -1,5 +1,5 @@
 package matrix
 
-func (b Bot) StartSync() error {
-	return b.client.Sync()
+func (c Client) StartSync() error {
+	return c.client.Sync()
 }

@@ -58,6 +58,10 @@ func NewUser() User {
 	}
 }
 
+func (l LeaderBoard) IsEmpty() bool {
+	return len(l.Users) == 0
+}
+
 func (l LeaderBoard) String() string {
 	var users []User
 	for _, user := range l.Users {
