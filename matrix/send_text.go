@@ -1,7 +1,7 @@
 package matrix
 
-func (b Bot) SendText(text string) error {
-	err := b.sendText(b.roomID, text)
+func (c Client) SendText(text string) error {
+	err := c.sendText(c.roomID, text)
 	if err != nil {
 		return ErrSendMessage
 	}

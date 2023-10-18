@@ -2,8 +2,8 @@ package matrix
 
 import "github.com/erdnaxeli/rudolphe/leaderboard"
 
-func (b Bot) SendLeaderBoard(leaderBoard leaderboard.LeaderBoard) error {
-	err := b.sendLeaderBoard(b.roomID, leaderBoard)
+func (c Client) SendLeaderBoard(leaderBoard leaderboard.LeaderBoard) error {
+	err := c.sendLeaderBoard(c.roomID, leaderBoard)
 	if err != nil {
 		return ErrSendMessage
 	}

@@ -7,5 +7,5 @@ import (
 const URL = "https://adventofcode.com"
 
 type Client interface {
-	GetLeaderBoard(year uint) leaderboard.LeaderBoard
+	GetLeaderBoard(year uint) (leaderboard.LeaderBoard, error)
 }
