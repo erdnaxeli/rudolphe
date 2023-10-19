@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"time"
+
 	"github.com/erdnaxeli/rudolphe/aoc"
 	"github.com/erdnaxeli/rudolphe/leaderboard"
 )
@@ -24,6 +26,8 @@ type Bot interface {
 type bot struct {
 	aocClient       aoc.Client
 	leaderBoardRepo leaderboard.Repository
+
+	lastRefresh time.Time
 }
 
 func New(

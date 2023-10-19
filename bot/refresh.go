@@ -12,6 +12,7 @@ import (
 func (b bot) Refresh() (Result, error) {
 	result := Result{}
 	now := time.Now()
+	b.lastRefresh = now
 
 	for year := now.Year(); year >= 2015; year-- {
 		slog.Info("Updating leaderboard", "year", year)
