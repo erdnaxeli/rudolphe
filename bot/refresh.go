@@ -9,9 +9,22 @@ import (
 	"github.com/erdnaxeli/rudolphe/leaderboard"
 )
 
-func (b bot) Refresh() (Result, error) {
-	result := Result{}
+func (b bot) Refresh() (Result, time.Duration, error) {
 	now := time.Now()
+	var sleep time.Duration
+	if time.January <= now.Month() && now.Month() <= time.November {
+		sleep = 5 * time.Hour
+	} else {
+		sleep = MIN_REFRESH_SLEEP
+	}
+
+	remainingTimeBeforeRefresh := sleep - time.Since(b.lastRefresh)
+	if remainingTimeBeforeRefresh > 0 {
+		slog.Info("Refreshing too early, skipping")
+		return EmptyResult, remainingTimeBeforeRefresh, nil
+	}
+
+	result := Result{}
 	b.lastRefresh = now
 
 	for year := now.Year(); year >= 2015; year-- {
@@ -53,7 +66,7 @@ func (b bot) Refresh() (Result, error) {
 		result.Messages = append(result.Messages, messages...)
 	}
 
-	return result, nil
+	return result, sleep, nil
 }
 
 func (b bot) printDiff(year int, diff leaderboard.Diff) []string {

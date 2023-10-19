@@ -9,12 +9,10 @@ import (
 
 func (b bot) ParseCommand(msg string) (Result, error) {
 	result, err := b.parseCommand(msg)
-	if err != nil {
-		return result, err
-	}
 
-	if time.Since(b.lastRefresh) >= 15*time.Minute {
-		refreshResult, err := b.Refresh()
+	if time.Since(b.lastRefresh) >= MIN_REFRESH_SLEEP {
+		slog.Info("Triggering auto refresh")
+		refreshResult, _, err := b.Refresh()
 		if err != nil {
 			slog.Warn("Error while auto refreshing", "error", err)
 		} else {
@@ -22,7 +20,7 @@ func (b bot) ParseCommand(msg string) (Result, error) {
 		}
 	}
 
-	return result, nil
+	return result, err
 }
 
 func (b bot) parseCommand(msg string) (Result, error) {

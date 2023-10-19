@@ -20,8 +20,11 @@ type Bot interface {
 	// Refresh all leaderboards.
 	//
 	// If any update happened, it returns the corresponding messages.
-	Refresh() (Result, error)
+	// It also returns the time to wait before the next refresh.
+	Refresh() (Result, time.Duration, error)
 }
+
+const MIN_REFRESH_SLEEP = 15 * time.Minute
 
 type bot struct {
 	aocClient       aoc.Client

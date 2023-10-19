@@ -73,8 +73,7 @@ func main() {
 func startUpdater(client matrix.Client, bot bot.Bot) error {
 	go func() {
 		for {
-			now := time.Now()
-			result, err := bot.Refresh()
+			result, sleep, err := bot.Refresh()
 			if err != nil {
 				slog.Error("Unable to refresh leaderboards", "error", err)
 			}
@@ -84,13 +83,6 @@ func startUpdater(client matrix.Client, bot bot.Bot) error {
 				if err != nil {
 					slog.Error("Unable to send messages", "error", err)
 				}
-			}
-
-			var sleep time.Duration
-			if time.January <= now.Month() && now.Month() <= time.November {
-				sleep = 5 * time.Hour
-			} else {
-				sleep = 15 * time.Minute
 			}
 
 			slog.Info("Going to sleep before next refresh", "sleep", sleep)
