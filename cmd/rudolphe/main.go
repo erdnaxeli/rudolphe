@@ -42,6 +42,7 @@ func main() {
 	minRefresher := bot.NewMinLimitedRefresher(clock, refresher)
 	monthRefresher := bot.NewMonthLimiterRefresher(clock, refresher)
 	messageParser := bot.NewAutoRefreshMessageParser(minRefresher, repo)
+	notifier := bot.NewNotifier(clock, repo)
 
 	client, err := matrix.NewClient(
 		matrix.Config{
@@ -57,6 +58,7 @@ func main() {
 	}
 
 	go refresh(client, monthRefresher)
+	go notify(client, notifier)
 	log.Fatal(client.StartSync())
 }
 
@@ -90,6 +92,38 @@ func refresh(client matrix.Client, refresher bot.LimitedRefresher) {
 		}
 
 		slog.Info("Going to sleep before next refresh", "sleep", sleep)
+		time.Sleep(sleep)
+	}
+}
+
+func notify(client matrix.Client, notifier bot.Notifier) {
+	sleep := notifier.GetSleep()
+	slog.Info("Going to sleep before next notification", "sleep", sleep)
+	time.Sleep(sleep)
+
+	for {
+		result, sleep, err := notifier.GetNotification()
+		if err != nil {
+			slog.Error("Unabled to get notification", "error", err)
+			time.Sleep(sleep)
+			continue
+		}
+
+		for _, msg := range result.Messages {
+			err := client.SendText(msg)
+			if err != nil {
+				slog.Error("Unable to send notification messages", "error", err)
+			}
+		}
+
+		if !result.LeaderBoard.IsEmpty() {
+			err := client.SendLeaderBoard(result.LeaderBoard)
+			if err != nil {
+				slog.Error("Unable to send notification leaderboard", "error", err)
+			}
+		}
+
+		slog.Info("Going to sleep before next notification", "sleep", sleep)
 		time.Sleep(sleep)
 	}
 }
