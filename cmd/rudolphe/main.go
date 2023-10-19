@@ -23,11 +23,44 @@ type Config struct {
 }
 
 func main() {
+	config := getConfig()
 	repo, err := leaderboard.NewSqliteRepository("db.sqlite")
 	if err != nil {
 		log.Fatalf("Unable to create repository: %v", err)
 	}
 
+	aocClient, err := aoc.NewJsonClient(
+		config.SessionCookie,
+		config.LeaderBoardID,
+	)
+	if err != nil {
+		log.Fatalf("Error while creating AOC client: %v", err)
+	}
+
+	clock := bot.DefaultClock{}
+	refresher := bot.NewRefresher(aocClient, clock, repo)
+	minRefresher := bot.NewMinLimitedRefresher(clock, refresher)
+	monthRefresher := bot.NewMonthLimiterRefresher(clock, refresher)
+	messageParser := bot.NewAutoRefreshMessageParser(minRefresher, repo)
+
+	client, err := matrix.NewClient(
+		matrix.Config{
+			HomeserverURL: config.HomeServerURL,
+			UserID:        config.UserID,
+			AccessToken:   config.AccessToken,
+			RoomID:        config.RoomID,
+			MessageParser: messageParser,
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go refresh(client, monthRefresher)
+	log.Fatal(client.StartSync())
+}
+
+func getConfig() Config {
 	content, err := os.ReadFile("config.json")
 	if err != nil {
 		log.Fatalf("Error while reading config: %v", err)
@@ -39,64 +72,24 @@ func main() {
 		log.Fatalf("Error while parsing config: %v", err)
 	}
 
-	aocClient, err := aoc.NewJsonClient(
-		config.SessionCookie,
-		config.LeaderBoardID,
-	)
-	if err != nil {
-		log.Fatalf("Error while creating AOC client: %v", err)
-	}
-
-	bot := bot.New(aocClient, repo)
-	client, err := matrix.NewClient(
-		matrix.Config{
-			HomeserverURL: config.HomeServerURL,
-			UserID:        config.UserID,
-			AccessToken:   config.AccessToken,
-			RoomID:        config.RoomID,
-			Bot:           bot,
-		},
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = startUpdater(client, bot)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Fatal(client.StartSync())
-	//mClient.SendText()
+	return config
 }
 
-func startUpdater(client matrix.Client, bot bot.Bot) error {
-	go func() {
-		for {
-			now := time.Now()
-			result, err := bot.Refresh()
-			if err != nil {
-				slog.Error("Unable to refresh leaderboards", "error", err)
-			}
-
-			for _, msg := range result.Messages {
-				err := client.SendText(msg)
-				if err != nil {
-					slog.Error("Unable to send messages", "error", err)
-				}
-			}
-
-			var sleep time.Duration
-			if time.January <= now.Month() && now.Month() <= time.November {
-				sleep = 5 * time.Hour
-			} else {
-				sleep = 15 * time.Minute
-			}
-
-			slog.Info("Going to sleep before next refresh", "sleep", sleep)
-			time.Sleep(sleep)
+func refresh(client matrix.Client, refresher bot.LimitedRefresher) {
+	for {
+		result, sleep, err := refresher.Refresh()
+		if err != nil {
+			slog.Error("Unable to refresh leaderboards", "error", err)
 		}
-	}()
 
-	return nil
+		for _, msg := range result.Messages {
+			err := client.SendText(msg)
+			if err != nil {
+				slog.Error("Unable to send messages", "error", err)
+			}
+		}
+
+		slog.Info("Going to sleep before next refresh", "sleep", sleep)
+		time.Sleep(sleep)
+	}
 }

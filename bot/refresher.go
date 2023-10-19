@@ -6,18 +6,53 @@ import (
 	"strings"
 	"time"
 
+	"github.com/erdnaxeli/rudolphe/aoc"
 	"github.com/erdnaxeli/rudolphe/leaderboard"
 )
 
-func (b bot) Refresh() (Result, error) {
+type Refresher interface {
+	// Refresh all leaderboards.
+	//
+	// If any update happened, it returns the corresponding messages.
+	Refresh() (Result, error)
+
+	// Return the last refresh time.
+	GetLastRefresh() time.Time
+}
+
+type DefaultRefresher struct {
+	aocClient aoc.Client
+	clock     Clock
+	repo      leaderboard.Repository
+
+	lastRefresh time.Time
+}
+
+func NewRefresher(
+	aocClient aoc.Client,
+	clock Clock,
+	repo leaderboard.Repository,
+) *DefaultRefresher {
+	return &DefaultRefresher{
+		aocClient: aocClient,
+		clock:     clock,
+		repo:      repo,
+	}
+}
+
+func (r *DefaultRefresher) GetLastRefresh() time.Time {
+	return r.lastRefresh
+}
+
+func (r *DefaultRefresher) Refresh() (Result, error) {
 	result := Result{}
 	now := time.Now()
-	b.lastRefresh = now
+	r.lastRefresh = now
 
 	for year := now.Year(); year >= 2015; year-- {
 		slog.Info("Updating leaderboard", "year", year)
 
-		lb, err := b.aocClient.GetLeaderBoard(uint(year))
+		lb, err := r.aocClient.GetLeaderBoard(uint(year))
 		if err != nil {
 			slog.Error(
 				"Unable to refresh leaderboard: %v",
@@ -27,7 +62,7 @@ func (b bot) Refresh() (Result, error) {
 			break
 		}
 
-		prevLb, err := b.leaderBoardRepo.GetLeaderBoard(uint(year))
+		prevLb, err := r.repo.GetLeaderBoard(uint(year))
 		if err != nil {
 			slog.Error(
 				"Unable to get previous leaderboard",
@@ -39,7 +74,7 @@ func (b bot) Refresh() (Result, error) {
 
 		diff := lb.Difference(prevLb)
 
-		err = b.leaderBoardRepo.SaveLeaderBoard(uint(year), lb)
+		err = r.repo.SaveLeaderBoard(uint(year), lb)
 		if err != nil {
 			slog.Error(
 				"Unable to save leaderboards: %v",
@@ -49,14 +84,14 @@ func (b bot) Refresh() (Result, error) {
 			break
 		}
 
-		messages := b.printDiff(year, diff)
+		messages := r.printDiff(year, diff)
 		result.Messages = append(result.Messages, messages...)
 	}
 
 	return result, nil
 }
 
-func (b bot) printDiff(year int, diff leaderboard.Diff) []string {
+func (r *DefaultRefresher) printDiff(year int, diff leaderboard.Diff) []string {
 	var messages []string
 
 	for _, user := range diff.Users {
