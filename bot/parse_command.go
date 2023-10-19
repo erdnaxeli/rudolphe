@@ -3,9 +3,29 @@ package bot
 import (
 	"strconv"
 	"time"
+
+	"golang.org/x/exp/slog"
 )
 
 func (b bot) ParseCommand(msg string) (Result, error) {
+	result, err := b.parseCommand(msg)
+	if err != nil {
+		return result, err
+	}
+
+	if time.Since(b.lastRefresh) >= 15*time.Minute {
+		refreshResult, err := b.Refresh()
+		if err != nil {
+			slog.Warn("Error while auto refreshing", "error", err)
+		} else {
+			result.Messages = append(result.Messages, refreshResult.Messages...)
+		}
+	}
+
+	return result, nil
+}
+
+func (b bot) parseCommand(msg string) (Result, error) {
 	if msg == "!lb" {
 		now := time.Now()
 		year := now.Year()
