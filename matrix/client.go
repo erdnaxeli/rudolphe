@@ -3,11 +3,9 @@ package matrix
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/erdnaxeli/rudolphe/bot"
-	"github.com/erdnaxeli/rudolphe/leaderboard"
 	"golang.org/x/exp/slog"
 	"maunium.net/go/mautrix"
 	"maunium.net/go/mautrix/event"
@@ -19,9 +17,8 @@ const MSG_MAX_SIZE = 10
 type Client struct {
 	startTime time.Time
 
-	bot    bot.Bot
 	client *mautrix.Client
-	roomID id.RoomID
+	config Config
 }
 
 type Config struct {
@@ -29,7 +26,7 @@ type Config struct {
 	UserID        string
 	AccessToken   string
 	RoomID        string
-	Bot           bot.Bot
+	MessageParser bot.MessageParser
 }
 
 func NewClient(config Config) (Client, error) {
@@ -42,10 +39,9 @@ func NewClient(config Config) (Client, error) {
 	}
 
 	client := Client{
-		bot:       config.Bot,
 		startTime: time.Now(),
+		config:    config,
 		client:    matrixClient,
-		roomID:    id.RoomID(config.RoomID),
 	}
 	syncer := matrixClient.Syncer.(*mautrix.DefaultSyncer)
 	syncer.OnEventType(event.EventMessage, client.onEventMessage)
@@ -60,7 +56,7 @@ func (c Client) onEventMessage(source mautrix.EventSource, evt *event.Event) {
 	}
 
 	content := evt.Content.AsMessage()
-	result, err := c.bot.ParseCommand(content.Body)
+	result, err := c.config.MessageParser.ParseMessage(content.Body)
 	if err != nil {
 		if errors.Is(err, bot.ErrUnknownCommand) {
 			return
@@ -85,56 +81,4 @@ func (c Client) onEventMessage(source mautrix.EventSource, evt *event.Event) {
 			return
 		}
 	}
-}
-
-func (b Client) sendText(roomID id.RoomID, message string) error {
-	err := b.sendMessage(roomID, message, "")
-	return err
-
-}
-
-func (b Client) sendMessage(roomID id.RoomID, message string, formattedMsg string) error {
-	if formattedMsg == "" {
-		formattedMsg = message
-	}
-
-	_, err := b.client.SendMessageEvent(
-		roomID,
-		event.EventMessage,
-		map[string]string{
-			"body":           message,
-			"format":         "org.matrix.custom.html",
-			"formatted_body": formattedMsg,
-			"msgtype":        "m.text",
-		},
-	)
-	if err != nil {
-		slog.Error("Error while sending message: %v", err)
-		return err
-	}
-
-	return nil
-}
-
-func (b Client) sendLeaderBoard(roomID id.RoomID, leaderBoard leaderboard.LeaderBoard) error {
-	msg := leaderBoard.String()
-	lines := strings.Split(msg, "\n")
-	chunk := strings.Join(lines[0:min(len(lines), MSG_MAX_SIZE)], "\n")
-	formatted := fmt.Sprintf("<pre>%s</pre>", chunk)
-	err := b.sendMessage(b.roomID, chunk, formatted)
-	if err != nil {
-		return err
-	}
-
-	for len(lines) > MSG_MAX_SIZE {
-		lines = lines[MSG_MAX_SIZE:]
-		chunk := strings.Join(lines[0:min(len(lines), MSG_MAX_SIZE)], "\n")
-		formatted := fmt.Sprintf("<pre>%s</pre>", chunk)
-		err = b.sendMessage(b.roomID, chunk, formatted)
-		if err != nil {
-			return err
-		}
-	}
-
-	return err
 }
