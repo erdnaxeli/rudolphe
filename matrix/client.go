@@ -57,12 +57,12 @@ func (c Client) onEventMessage(source mautrix.EventSource, evt *event.Event) {
 
 	content := evt.Content.AsMessage()
 	result, err := c.config.MessageParser.ParseMessage(content.Body)
-	if err != nil {
-		if errors.Is(err, bot.ErrUnknownCommand) {
-			return
-		}
-
-		slog.Error("Error while parsing command", "error", err)
+	if err != nil && !errors.Is(err, bot.ErrUnknownCommand) {
+		slog.Error(
+			"Error while parsing message",
+			"error", err,
+			"message", content.Body,
+		)
 		return
 	}
 
