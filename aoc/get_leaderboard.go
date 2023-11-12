@@ -18,7 +18,7 @@ func (a JsonClient) GetLeaderBoard(year uint) (leaderboard.LeaderBoard, error) {
 		),
 	)
 	if err != nil {
-		return leaderboard.LeaderBoard{}, fmt.Errorf("Error during HTTP request: %v", err)
+		return leaderboard.LeaderBoard{}, fmt.Errorf("Error during HTTP request: %v", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
