@@ -68,6 +68,13 @@ func (n DefaultNotifier) GetSleep() time.Duration {
 	}
 
 	tomorrow := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, location)
-	sleep = tomorrow.Sub(now)
+	endOfAOC := time.Date(now.Year(), time.December, 25, 0, 0, 0, 0, location)
+	if tomorrow.Before(endOfAOC) {
+		sleep = tomorrow.Sub(now)
+		return sleep
+	}
+
+	firstOfDecemberNextYear := time.Date(now.Year()+1, time.December, 1, 0, 0, 0, 0, location)
+	sleep = firstOfDecemberNextYear.Sub(now)
 	return sleep
 }
