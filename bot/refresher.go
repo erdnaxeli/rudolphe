@@ -49,7 +49,12 @@ func (r *DefaultRefresher) Refresh() (Result, error) {
 	now := time.Now()
 	r.lastRefresh = now
 
-	for year := now.Year(); year >= 2015; year-- {
+	maxYear := now.Year()
+	if now.Month() < time.December {
+		maxYear--
+	}
+
+	for year := maxYear; year >= 2015; year-- {
 		slog.Info("Updating leaderboard", "year", year)
 
 		lb, err := r.aocClient.GetLeaderBoard(uint(year))
