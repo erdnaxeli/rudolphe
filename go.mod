@@ -6,9 +6,9 @@ require (
 	github.com/golangci/golangci-lint v1.56.1
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc
+	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3
 	golang.org/x/net v0.20.0
-	maunium.net/go/mautrix v0.16.2
+	maunium.net/go/mautrix v0.17.0
 )
 
 require (
@@ -179,7 +179,7 @@ require (
 	gitlab.com/bosi/decorder v0.4.1 // indirect
 	go-simpler.org/musttag v0.8.0 // indirect
 	go-simpler.org/sloglint v0.4.0 // indirect
-	go.mau.fi/util v0.2.1 // indirect
+	go.mau.fi/util v0.3.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
