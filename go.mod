@@ -6,8 +6,8 @@ require (
 	github.com/golangci/golangci-lint v1.56.1
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3
-	golang.org/x/net v0.20.0
+	golang.org/x/exp v0.0.0-20240213143201-ec583247a57a
+	golang.org/x/net v0.21.0
 	maunium.net/go/mautrix v0.17.0
 )
 
@@ -134,7 +134,7 @@ require (
 	github.com/quasilyte/gogrep v0.5.0 // indirect
 	github.com/quasilyte/regex/syntax v0.0.0-20210819130434-b3f0c404a727 // indirect
 	github.com/quasilyte/stdinfo v0.0.0-20220114132959-f7386bf02567 // indirect
-	github.com/rs/zerolog v1.31.0 // indirect
+	github.com/rs/zerolog v1.32.0 // indirect
 	github.com/ryancurrah/gomodguard v1.3.0 // indirect
 	github.com/ryanrolds/sqlclosecheck v0.5.1 // indirect
 	github.com/sanposhiho/wastedassign/v2 v2.0.7 // indirect
@@ -161,7 +161,7 @@ require (
 	github.com/t-yuki/gocover-cobertura v0.0.0-20180217150009-aaee18c8195c // indirect
 	github.com/tdakkota/asciicheck v0.2.0 // indirect
 	github.com/tetafro/godot v1.4.16 // indirect
-	github.com/tidwall/gjson v1.17.0 // indirect
+	github.com/tidwall/gjson v1.17.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
@@ -179,17 +179,17 @@ require (
 	gitlab.com/bosi/decorder v0.4.1 // indirect
 	go-simpler.org/musttag v0.8.0 // indirect
 	go-simpler.org/sloglint v0.4.0 // indirect
-	go.mau.fi/util v0.3.0 // indirect
+	go.mau.fi/util v0.4.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231219180239-dc181d75b848 // indirect
 	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.17.0 // indirect
+	golang.org/x/tools v0.18.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
