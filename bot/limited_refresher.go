@@ -1,11 +1,12 @@
 package bot
 
 import (
+	"context"
 	"time"
 )
 
 type LimitedRefresher interface {
-	Refresh() (Result, time.Duration, error)
+	Refresh(ctx context.Context) (Result, time.Duration, error)
 }
 
 const (
@@ -28,9 +29,9 @@ func NewMinLimitedRefresher(clock Clock, refresher Refresher) MinLimitedRefreshe
 	}
 }
 
-func (m MinLimitedRefresher) Refresh() (Result, time.Duration, error) {
+func (m MinLimitedRefresher) Refresh(ctx context.Context) (Result, time.Duration, error) {
 	now := m.clock.Now()
-	return tryRefresh(now, MIN_REFRESH_SLEEP, m.refresher)
+	return tryRefresh(ctx, now, MIN_REFRESH_SLEEP, m.refresher)
 }
 
 // MonthLimiterRefresher apply a limit depending on the current month.
@@ -49,7 +50,7 @@ func NewMonthLimiterRefresher(clock Clock, refresher Refresher) MonthLimiterRefr
 	}
 }
 
-func (m MonthLimiterRefresher) Refresh() (Result, time.Duration, error) {
+func (m MonthLimiterRefresher) Refresh(ctx context.Context) (Result, time.Duration, error) {
 	now := m.clock.Now()
 	var sleep time.Duration
 	if now.Month() == time.December {
@@ -58,15 +59,15 @@ func (m MonthLimiterRefresher) Refresh() (Result, time.Duration, error) {
 		sleep = IDLE_REFRESH_SLEEP
 	}
 
-	return tryRefresh(now, sleep, m.refresher)
+	return tryRefresh(ctx, now, sleep, m.refresher)
 }
 
-func tryRefresh(now time.Time, sleep time.Duration, refresher Refresher) (Result, time.Duration, error) {
+func tryRefresh(ctx context.Context, now time.Time, sleep time.Duration, refresher Refresher) (Result, time.Duration, error) {
 	remainingSleep := sleep - now.Sub(refresher.GetLastRefresh())
 	if remainingSleep > 0 {
 		return EmptyResult, remainingSleep, nil
 	}
 
-	result, err := refresher.Refresh()
+	result, err := refresher.Refresh(ctx)
 	return result, sleep, err
 }

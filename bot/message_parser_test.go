@@ -1,6 +1,7 @@
 package bot_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -14,13 +15,13 @@ type MRepo struct {
 	mock.Mock
 }
 
-func (r *MRepo) GetLeaderBoard(year uint) (leaderboard.LeaderBoard, error) {
-	args := r.Called(year)
+func (r *MRepo) GetLeaderBoard(ctx context.Context, year uint) (leaderboard.LeaderBoard, error) {
+	args := r.Called(ctx, year)
 	return args.Get(0).(leaderboard.LeaderBoard), args.Error(1)
 }
 
-func (r *MRepo) SaveLeaderBoard(year uint, leaderboard leaderboard.LeaderBoard) error {
-	args := r.Called(year)
+func (r *MRepo) SaveLeaderBoard(ctx context.Context, year uint, leaderboard leaderboard.LeaderBoard) error {
+	args := r.Called(ctx, year)
 	return args.Error(0)
 }
 
@@ -28,8 +29,8 @@ type MRefresher struct {
 	mock.Mock
 }
 
-func (r *MRefresher) Refresh() (bot.Result, time.Duration, error) {
-	args := r.Called()
+func (r *MRefresher) Refresh(ctx context.Context) (bot.Result, time.Duration, error) {
+	args := r.Called(ctx)
 	return args.Get(0).(bot.Result), args.Get(1).(time.Duration), args.Error(2)
 }
 
@@ -37,7 +38,7 @@ func TestAutoRefreshMessageParser(t *testing.T) {
 	// setup
 	repo := &MRepo{}
 	refresher := &MRefresher{}
-	refresher.On("Refresh").Return(
+	refresher.On("Refresh", mock.AnythingOfType("backgroundCtx")).Return(
 		bot.Result{
 			LeaderBoard: leaderboard.LeaderBoard{},
 			Messages:    []string{"some message", "another one"},
@@ -47,9 +48,10 @@ func TestAutoRefreshMessageParser(t *testing.T) {
 	)
 
 	parser := bot.NewAutoRefreshMessageParser(refresher, repo)
+	ctx := context.Background()
 
 	// test
-	result, err := parser.ParseMessage("test")
+	result, err := parser.ParseMessage(ctx, "test")
 
 	// assertions
 	assert.ErrorIs(t, err, bot.ErrUnknownCommand)

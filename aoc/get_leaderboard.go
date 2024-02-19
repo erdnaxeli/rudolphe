@@ -1,6 +1,7 @@
 package aoc
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,13 +11,20 @@ import (
 	"github.com/erdnaxeli/rudolphe/leaderboard"
 )
 
-func (a JsonClient) GetLeaderBoard(year uint) (leaderboard.LeaderBoard, error) {
-	resp, err := a.client.Get(
+func (a JsonClient) GetLeaderBoard(ctx context.Context, year uint) (leaderboard.LeaderBoard, error) {
+	request, err := http.NewRequestWithContext(
+		ctx,
+		"GET",
 		fmt.Sprintf(
 			"%s/%d/leaderboard/private/view/%s.json",
 			URL, year, a.leaderBoardID,
 		),
+		nil,
 	)
+	if err != nil {
+		return leaderboard.LeaderBoard{}, fmt.Errorf("Error while crafting HTTP request: %v", err)
+	}
+	resp, err := a.client.Do(request)
 	if err != nil {
 		return leaderboard.LeaderBoard{}, fmt.Errorf("Error during HTTP request: %v", err)
 	}
@@ -37,9 +45,9 @@ func (a JsonClient) GetLeaderBoard(year uint) (leaderboard.LeaderBoard, error) {
 		return leaderboard.LeaderBoard{}, fmt.Errorf("Error while reading json: %v", err)
 	}
 
-	var lb = leaderboard.NewLeaderBoard()
+	lb := leaderboard.NewLeaderBoard()
 	for memberID, member := range jsonLB.Members {
-		var user = leaderboard.NewUser()
+		user := leaderboard.NewUser()
 
 		user.ID = memberID
 		user.Name = member.Name

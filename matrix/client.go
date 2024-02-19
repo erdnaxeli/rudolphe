@@ -57,7 +57,7 @@ func (c Client) onEventMessage(ctx context.Context, evt *event.Event) {
 	}
 
 	content := evt.Content.AsMessage()
-	result, err := c.config.MessageParser.ParseMessage(content.Body)
+	result, err := c.config.MessageParser.ParseMessage(ctx, content.Body)
 	if err != nil && !errors.Is(err, bot.ErrUnknownCommand) {
 		slog.Error(
 			"Error while parsing message",
@@ -68,7 +68,7 @@ func (c Client) onEventMessage(ctx context.Context, evt *event.Event) {
 	}
 
 	if !result.LeaderBoard.IsEmpty() {
-		err := c.sendLeaderBoard(evt.RoomID, result.LeaderBoard)
+		err := c.sendLeaderBoard(ctx, evt.RoomID, result.LeaderBoard)
 		if err != nil {
 			slog.Error("Error while sending leaderboard message", "error", err)
 			return
@@ -76,7 +76,7 @@ func (c Client) onEventMessage(ctx context.Context, evt *event.Event) {
 	}
 
 	for _, msg := range result.Messages {
-		err := c.sendText(evt.RoomID, msg)
+		err := c.sendText(ctx, evt.RoomID, msg)
 		if err != nil {
 			slog.Error("Error while sending message", "error", err)
 			return

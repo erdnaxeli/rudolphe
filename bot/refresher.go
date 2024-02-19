@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -14,7 +15,7 @@ type Refresher interface {
 	// Refresh all leaderboards.
 	//
 	// If any update happened, it returns the corresponding messages.
-	Refresh() (Result, error)
+	Refresh(ctx context.Context) (Result, error)
 
 	// Return the last refresh time.
 	GetLastRefresh() time.Time
@@ -44,7 +45,7 @@ func (r *DefaultRefresher) GetLastRefresh() time.Time {
 	return r.lastRefresh
 }
 
-func (r *DefaultRefresher) Refresh() (Result, error) {
+func (r *DefaultRefresher) Refresh(ctx context.Context) (Result, error) {
 	result := Result{}
 	now := time.Now()
 	r.lastRefresh = now
@@ -57,7 +58,7 @@ func (r *DefaultRefresher) Refresh() (Result, error) {
 	for year := maxYear; year >= 2015; year-- {
 		slog.Info("Updating leaderboard", "year", year)
 
-		lb, err := r.aocClient.GetLeaderBoard(uint(year))
+		lb, err := r.aocClient.GetLeaderBoard(ctx, uint(year))
 		if err != nil {
 			slog.Error(
 				"Unable to refresh leaderboard: %v",
@@ -67,7 +68,7 @@ func (r *DefaultRefresher) Refresh() (Result, error) {
 			break
 		}
 
-		prevLb, err := r.repo.GetLeaderBoard(uint(year))
+		prevLb, err := r.repo.GetLeaderBoard(ctx, uint(year))
 		if err != nil {
 			slog.Error(
 				"Unable to get previous leaderboard",
@@ -79,7 +80,7 @@ func (r *DefaultRefresher) Refresh() (Result, error) {
 
 		diff := lb.Difference(prevLb)
 
-		err = r.repo.SaveLeaderBoard(uint(year), lb)
+		err = r.repo.SaveLeaderBoard(ctx, uint(year), lb)
 		if err != nil {
 			slog.Error(
 				"Unable to save leaderboards: %v",

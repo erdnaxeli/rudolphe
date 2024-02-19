@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -15,7 +16,7 @@ type Notifier interface {
 	// messages.
 	// If any error happens the result should be discarded but the duration to wait
 	// will still be the correct one.
-	GetNotification() (Result, time.Duration, error)
+	GetNotification(ctx context.Context) (Result, time.Duration, error)
 	// GetSleep returns the time to wait until the next notification.
 	//
 	// It is useful on start to just wait until the next notification, and then start
@@ -41,9 +42,9 @@ func NewNotifier(clock Clock, repo leaderboard.Repository) DefaultNotifier {
 	}
 }
 
-func (n DefaultNotifier) GetNotification() (Result, time.Duration, error) {
+func (n DefaultNotifier) GetNotification(ctx context.Context) (Result, time.Duration, error) {
 	now := n.clock.Now()
-	leaderboard, err := n.repo.GetLeaderBoard(uint(now.Year()))
+	leaderboard, err := n.repo.GetLeaderBoard(ctx, uint(now.Year()))
 	if err != nil {
 		return EmptyResult, 10 * time.Minute, err
 	}

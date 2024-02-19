@@ -1,5 +1,7 @@
 package matrix
 
-func (c Client) StartSync() error {
-	return c.client.Sync()
+import "context"
+
+func (c Client) StartSync(ctx context.Context) error {
+	return c.client.SyncWithContext(ctx)
 }

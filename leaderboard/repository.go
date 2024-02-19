@@ -1,6 +1,7 @@
 package leaderboard
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -9,8 +10,8 @@ import (
 )
 
 type Repository interface {
-	GetLeaderBoard(year uint) (LeaderBoard, error)
-	SaveLeaderBoard(year uint, leaderboard LeaderBoard) error
+	GetLeaderBoard(ctx context.Context, year uint) (LeaderBoard, error)
+	SaveLeaderBoard(ctx context.Context, year uint, leaderboard LeaderBoard) error
 }
 
 type SqliteRepository struct {
