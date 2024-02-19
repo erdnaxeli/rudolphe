@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"context"
 	"strconv"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 
 type MessageParser interface {
 	// Parse a message and return a response if it was a bot command.
-	ParseMessage(msg string) (Result, error)
+	ParseMessage(ctx context.Context, msg string) (Result, error)
 }
 
 // AutoRefreshMessageParser parse messages and trigger a refresh.
@@ -32,18 +33,18 @@ func NewAutoRefreshMessageParser(
 	}
 }
 
-func (m AutoRefreshMessageParser) ParseMessage(msg string) (Result, error) {
-	refreshResult, _, err := m.refresher.Refresh()
+func (m AutoRefreshMessageParser) ParseMessage(ctx context.Context, msg string) (Result, error) {
+	refreshResult, _, err := m.refresher.Refresh(ctx)
 	if err != nil {
 		slog.Warn("Error while auto refreshing", "error", err)
 	}
 
-	result, err := m.doParseMessage(msg)
+	result, err := m.doParseMessage(ctx, msg)
 	result.Messages = append(refreshResult.Messages, result.Messages...)
 	return result, err
 }
 
-func (m AutoRefreshMessageParser) doParseMessage(msg string) (Result, error) {
+func (m AutoRefreshMessageParser) doParseMessage(ctx context.Context, msg string) (Result, error) {
 	year := -1
 
 	if msg == "!lb" {
@@ -62,7 +63,7 @@ func (m AutoRefreshMessageParser) doParseMessage(msg string) (Result, error) {
 	}
 
 	if year > 0 {
-		lb, err := m.repo.GetLeaderBoard(uint(year))
+		lb, err := m.repo.GetLeaderBoard(ctx, uint(year))
 		if err != nil {
 			return EmptyResult, err
 		}

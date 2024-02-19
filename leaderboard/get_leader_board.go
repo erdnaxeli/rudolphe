@@ -1,11 +1,14 @@
 package leaderboard
 
 import (
+	"context"
+
 	"golang.org/x/exp/slog"
 )
 
-func (r SqliteRepository) GetLeaderBoard(year uint) (LeaderBoard, error) {
-	rows, err := r.db.Query(
+func (r SqliteRepository) GetLeaderBoard(ctx context.Context, year uint) (LeaderBoard, error) {
+	rows, err := r.db.QueryContext(
+		ctx,
 		`
 			SELECT
 				users.id,

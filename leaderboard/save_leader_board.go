@@ -1,6 +1,8 @@
 package leaderboard
 
-func (r SqliteRepository) SaveLeaderBoard(year uint, leaderboard LeaderBoard) error {
+import "context"
+
+func (r SqliteRepository) SaveLeaderBoard(ctx context.Context, year uint, leaderboard LeaderBoard) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		// TODO
@@ -8,7 +10,8 @@ func (r SqliteRepository) SaveLeaderBoard(year uint, leaderboard LeaderBoard) er
 	}
 
 	for _, user := range leaderboard.Users {
-		_, err := tx.Exec(
+		_, err := tx.ExecContext(
+			ctx,
 			`
 				INSERT OR REPLACE INTO
 				users (id, name)

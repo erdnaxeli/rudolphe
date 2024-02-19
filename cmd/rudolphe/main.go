@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"log/slog"
@@ -59,7 +60,9 @@ func main() {
 
 	go refresh(client, monthRefresher)
 	go notify(client, notifier)
-	log.Fatal(client.StartSync())
+
+	ctx := context.Background()
+	log.Fatal(client.StartSync(ctx))
 }
 
 func getConfig() Config {
@@ -79,21 +82,30 @@ func getConfig() Config {
 
 func refresh(client matrix.Client, refresher bot.LimitedRefresher) {
 	for {
-		result, sleep, err := refresher.Refresh()
-		if err != nil {
-			slog.Error("Unable to refresh leaderboards", "error", err)
-		}
-
-		for _, msg := range result.Messages {
-			err := client.SendText(msg)
-			if err != nil {
-				slog.Error("Unable to send messages", "error", err)
-			}
-		}
-
+		sleep := doRefresh(client, refresher)
 		slog.Info("Going to sleep before next refresh", "sleep", sleep)
 		time.Sleep(sleep)
 	}
+}
+
+func doRefresh(client matrix.Client, refresher bot.LimitedRefresher) time.Duration {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 180*time.Second)
+	defer cancel()
+
+	result, sleep, err := refresher.Refresh(ctx)
+	if err != nil {
+		slog.Error("Unable to refresh leaderboards", "error", err)
+	}
+
+	for _, msg := range result.Messages {
+		err := client.SendText(ctx, msg)
+		if err != nil {
+			slog.Error("Unable to send messages", "error", err)
+		}
+	}
+
+	return sleep
 }
 
 func notify(client matrix.Client, notifier bot.Notifier) {
@@ -102,28 +114,36 @@ func notify(client matrix.Client, notifier bot.Notifier) {
 	time.Sleep(sleep)
 
 	for {
-		result, sleep, err := notifier.GetNotification()
-		if err != nil {
-			slog.Error("Unabled to get notification", "error", err)
-			time.Sleep(sleep)
-			continue
-		}
-
-		for _, msg := range result.Messages {
-			err := client.SendText(msg)
-			if err != nil {
-				slog.Error("Unable to send notification messages", "error", err)
-			}
-		}
-
-		if !result.LeaderBoard.IsEmpty() {
-			err := client.SendLeaderBoard(result.LeaderBoard)
-			if err != nil {
-				slog.Error("Unable to send notification leaderboard", "error", err)
-			}
-		}
-
+		sleep := doNotify(client, notifier)
 		slog.Info("Going to sleep before next notification", "sleep", sleep)
 		time.Sleep(sleep)
 	}
+}
+
+func doNotify(client matrix.Client, notifier bot.Notifier) time.Duration {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 180*time.Second)
+	defer cancel()
+
+	result, sleep, err := notifier.GetNotification(ctx)
+	if err != nil {
+		slog.Error("Unabled to get notification", "error", err)
+		return sleep
+	}
+
+	for _, msg := range result.Messages {
+		err := client.SendText(ctx, msg)
+		if err != nil {
+			slog.Error("Unable to send notification messages", "error", err)
+		}
+	}
+
+	if !result.LeaderBoard.IsEmpty() {
+		err := client.SendLeaderBoard(ctx, result.LeaderBoard)
+		if err != nil {
+			slog.Error("Unable to send notification leaderboard", "error", err)
+		}
+	}
+
+	return sleep
 }
