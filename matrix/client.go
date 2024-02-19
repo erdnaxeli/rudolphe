@@ -1,6 +1,7 @@
 package matrix
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -49,7 +50,7 @@ func NewClient(config Config) (Client, error) {
 	return client, nil
 }
 
-func (c Client) onEventMessage(source mautrix.EventSource, evt *event.Event) {
+func (c Client) onEventMessage(ctx context.Context, evt *event.Event) {
 	evtTime := time.Unix(evt.Timestamp/1000, 0)
 	if evtTime.Before(c.startTime) {
 		return
