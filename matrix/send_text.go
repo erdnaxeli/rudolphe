@@ -1,6 +1,8 @@
 package matrix
 
 import (
+	"context"
+
 	"golang.org/x/exp/slog"
 	"maunium.net/go/mautrix/event"
 	"maunium.net/go/mautrix/id"
@@ -18,7 +20,6 @@ func (c Client) SendText(text string) error {
 func (c Client) sendText(roomID id.RoomID, message string) error {
 	err := c.sendMessage(roomID, message, "")
 	return err
-
 }
 
 func (c Client) sendMessage(roomID id.RoomID, message string, formattedMsg string) error {
@@ -27,6 +28,7 @@ func (c Client) sendMessage(roomID id.RoomID, message string, formattedMsg strin
 	}
 
 	_, err := c.client.SendMessageEvent(
+		context.Background(),
 		roomID,
 		event.EventMessage,
 		map[string]string{
