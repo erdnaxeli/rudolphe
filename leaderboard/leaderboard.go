@@ -36,8 +36,8 @@ func (u User) GetName() string {
 }
 
 func (u User) GetNameWithoutHL() string {
-	// It joins with a "zero width non-joiner" char.
-	return strings.Join(strings.Split(u.GetName(), ""), "\u200C")
+	// It joins with a "zero width space" char.
+	return strings.Join(strings.Split(u.GetName(), ""), "\u200B")
 }
 
 type Day struct {
