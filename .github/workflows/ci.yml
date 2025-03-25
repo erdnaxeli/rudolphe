@@ -12,10 +12,9 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: latest
-          skip-pkg-cache: true
           args: --timeout=30m
   tests:
     runs-on: ubuntu-latest
