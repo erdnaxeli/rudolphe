@@ -2,4 +2,4 @@ package leaderboard
 
 import "errors"
 
-var ErrDBOpen = errors.New("Cannot open database")
+var ErrDBOpen = errors.New("cannot open database")

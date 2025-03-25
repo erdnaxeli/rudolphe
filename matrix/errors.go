@@ -2,4 +2,4 @@ package matrix
 
 import "errors"
 
-var ErrSendMessage = errors.New("Error while sending message")
+var ErrSendMessage = errors.New("error while sending message")

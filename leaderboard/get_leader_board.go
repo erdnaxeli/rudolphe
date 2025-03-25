@@ -55,13 +55,14 @@ func (r SqliteRepository) GetLeaderBoard(ctx context.Context, year uint) (Leader
 		}
 
 		var part Part
-		if parts == 0 {
+		switch parts {
+		case 0:
 			part = None
-		} else if parts == 1 {
+		case 1:
 			part = Part1
-		} else if parts == 2 {
+		case 2:
 			part = Part2
-		} else {
+		default:
 			slog.Warn(
 				"Invalid part count for user",
 				"user", userID,

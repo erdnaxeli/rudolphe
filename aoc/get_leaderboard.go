@@ -22,11 +22,11 @@ func (a JsonClient) GetLeaderBoard(ctx context.Context, year uint) (leaderboard.
 		nil,
 	)
 	if err != nil {
-		return leaderboard.LeaderBoard{}, fmt.Errorf("Error while crafting HTTP request: %v", err)
+		return leaderboard.LeaderBoard{}, fmt.Errorf("error while crafting HTTP request: %v", err)
 	}
 	resp, err := a.client.Do(request)
 	if err != nil {
-		return leaderboard.LeaderBoard{}, fmt.Errorf("Error during HTTP request: %v", err)
+		return leaderboard.LeaderBoard{}, fmt.Errorf("error during HTTP request: %v", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -36,13 +36,13 @@ func (a JsonClient) GetLeaderBoard(ctx context.Context, year uint) (leaderboard.
 	defer resp.Body.Close()
 	content, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return leaderboard.LeaderBoard{}, fmt.Errorf("Error while reading body: %v", err)
+		return leaderboard.LeaderBoard{}, fmt.Errorf("error while reading body: %v", err)
 	}
 
 	var jsonLB jsonLeaderBoard
 	err = json.Unmarshal(content, &jsonLB)
 	if err != nil {
-		return leaderboard.LeaderBoard{}, fmt.Errorf("Error while reading json: %v", err)
+		return leaderboard.LeaderBoard{}, fmt.Errorf("error while reading json: %v", err)
 	}
 
 	lb := leaderboard.NewLeaderBoard()
@@ -65,7 +65,7 @@ func (a JsonClient) GetLeaderBoard(ctx context.Context, year uint) (leaderboard.
 			case 2:
 				part = leaderboard.Part2
 			default:
-				err := fmt.Errorf("Invalid number of parts completed: %d", len(parts))
+				err := fmt.Errorf("invalid number of parts completed: %d", len(parts))
 				return leaderboard.LeaderBoard{}, err
 			}
 

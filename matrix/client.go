@@ -36,7 +36,7 @@ func NewClient(config Config) (Client, error) {
 	)
 	if err != nil {
 		//nolint:errorlint
-		return Client{}, fmt.Errorf("Error while creating client: %v", err)
+		return Client{}, fmt.Errorf("error while creating client: %v", err)
 	}
 
 	client := Client{
