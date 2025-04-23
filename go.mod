@@ -8,9 +8,9 @@ require (
 	github.com/golangci/golangci-lint/v2 v2.1.2
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
+	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
 	golang.org/x/net v0.39.0
-	maunium.net/go/mautrix v0.23.2
+	maunium.net/go/mautrix v0.23.3
 )
 
 require (
