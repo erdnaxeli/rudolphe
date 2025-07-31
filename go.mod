@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/golangci/golangci-lint/v2 v2.2.1
-	github.com/mattn/go-sqlite3 v1.14.28
+	github.com/mattn/go-sqlite3 v1.14.29
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20250606033433-dcc06ee1d476
 	golang.org/x/net v0.42.0
