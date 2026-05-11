@@ -6,6 +6,10 @@ linters:
     generated: lax
     presets:
       - std-error-handling
+  settings:
+    govet:
+      disable:
+        - inline
 formatters:
   exclusions:
     generated: lax

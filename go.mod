@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/golangci/golangci-lint/v2 v2.11.4
-	github.com/mattn/go-sqlite3 v1.14.42
+	github.com/mattn/go-sqlite3 v1.14.44
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
 	golang.org/x/net v0.53.0
