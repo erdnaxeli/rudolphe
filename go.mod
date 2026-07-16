@@ -3,7 +3,7 @@ module github.com/erdnaxeli/rudolphe
 go 1.25.0
 
 require (
-	github.com/mattn/go-sqlite3 v1.14.47
+	github.com/mattn/go-sqlite3 v1.14.48
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20260611194520-c48552f49976
 	golang.org/x/net v0.57.0
