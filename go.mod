@@ -6,7 +6,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.52
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
-	golang.org/x/net v0.61.0
+	golang.org/x/net v0.62.0
 	maunium.net/go/mautrix v0.32.0
 )
 
